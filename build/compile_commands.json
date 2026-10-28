@@ -1,8 +1,0 @@
-[
-{
-  "directory": "/home/danilo/projects/cpuinf/build",
-  "command": "/usr/bin/clang++ -DCPUINFO_SUPPORTED_PLATFORM=1 -I/usr/include/cairo -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/pixman-1 -g -std=gnu++23 -Wno-writable-strings -o CMakeFiles/cpuinf.dir/main.cpp.o -c /home/danilo/projects/cpuinf/main.cpp",
-  "file": "/home/danilo/projects/cpuinf/main.cpp",
-  "output": "/home/danilo/projects/cpuinf/build/CMakeFiles/cpuinf.dir/main.cpp.o"
-}
-]
