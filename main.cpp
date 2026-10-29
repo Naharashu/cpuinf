@@ -72,6 +72,22 @@ std::string get_features() {
     if (cpuinfo_has_x86_f16c())
         features += ", F16C";
 
+    std::ifstream f("/proc/cpuinfo");
+    std::string line;
+
+    while(std::getline(f, line)) {
+        if(line.contains(" vmx ")) {
+            features += ", Intel VT-X";
+            break;
+        }
+        if(line.contains(" svm ")) {
+            features += ", AMD-V";
+            break;
+        }
+    }
+
+    f.close();
+
     return features;
 }
 
@@ -241,7 +257,7 @@ int main(int argc, char *argv[]) {
 
     
 
-    Fl_Window *window = new Fl_Cairo_Window(480, 600, "CPU-INF 1.0");
+    Fl_Window *window = new Fl_Cairo_Window(480, 600, "CPU-INF");
     Fl::scheme("gleam");
     Fl::background(45, 45, 48);
 
@@ -294,7 +310,7 @@ int main(int argc, char *argv[]) {
 
     {
         about = new Fl_Box(10, 35, 460, 200,
-            "CPU-INF 1.0\nBy Naharashu\nRepo: https://github.com/Naharashu/cpuinf");
+            "CPU-INF 1.1\nBy Naharashu\nRepo: https://github.com/Naharashu/cpuinf");
         about->align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_WRAP);
     }
     page2->end();
