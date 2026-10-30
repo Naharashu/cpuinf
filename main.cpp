@@ -24,71 +24,91 @@
 
 
 std::string get_features() {
-    struct utsname buffer;
-    uname(&buffer);
-    std::string features = std::string(buffer.machine) == "x86_64" ? "x86_64" : "x86";
+    #if defined(__x86_64__) || defined (__i386__)
+        struct utsname buffer;
+        uname(&buffer);
+        std::string features = std::string(buffer.machine) == "x86_64" ? "x86_64" : "x86";
 
-    if (cpuinfo_has_x86_fpu())
-        features += ", x87";
-    if (cpuinfo_has_x86_mmx())
-        features += ", MMX";
-    if (cpuinfo_has_x86_sse())
-        features += ", SSE1";
-    if (cpuinfo_has_x86_sse2())
-        features += ", SSE2";
-    if (cpuinfo_has_x86_sse3())
-        features += ", SSE3";
-    if (cpuinfo_has_x86_ssse3())
-        features += ", SSSE3";
-    if (cpuinfo_has_x86_sse4_1())
-        features += ", SSE4.1";
-    if (cpuinfo_has_x86_sse4_2())
-        features += ", SSE4.2";
-    if (cpuinfo_has_x86_aes())
-        features += ", AES-NI";
-    if (cpuinfo_has_x86_sha())
-        features += ", SHA-NI";
-    if (cpuinfo_has_x86_avx())
-        features += ", AVX";
-    if (cpuinfo_has_x86_avx2())
-        features += ", AVX2";
-    if (cpuinfo_has_x86_avx512f() && cpuinfo_has_x86_avx512bw() && cpuinfo_has_x86_avx512dq() &&
-        cpuinfo_has_x86_avx512cd() && cpuinfo_has_x86_avx512vl())
-        features += ", AVX512(F, BW, DQ, CD, VL)";
-    if (cpuinfo_has_x86_avx10_1())
-        features += ", AVX10.1";
-    if (cpuinfo_has_x86_avx10_2())
-        features += ", AVX10.2";
-    if (cpuinfo_has_x86_popcnt())
-        features += ", POPCNT";
-    if (cpuinfo_has_x86_lzcnt())
-        features += ", LZCNT";
-    if (cpuinfo_has_x86_bmi())
-        features += ", BMI1";
-    if (cpuinfo_has_x86_bmi2())
-        features += ", BMI2";
-    if (cpuinfo_has_x86_fma3())
-        features += ", FMA3";
-    if (cpuinfo_has_x86_fma4())
-        features += ", FMA4";
-    if (cpuinfo_has_x86_f16c())
-        features += ", F16C";
+        if (cpuinfo_has_x86_fpu())
+            features += ", x87";
+        if (cpuinfo_has_x86_mmx())
+            features += ", MMX";
+        if (cpuinfo_has_x86_sse())
+            features += ", SSE1";
+        if (cpuinfo_has_x86_sse2())
+            features += ", SSE2";
+        if (cpuinfo_has_x86_sse3())
+            features += ", SSE3";
+        if (cpuinfo_has_x86_ssse3())
+            features += ", SSSE3";
+        if (cpuinfo_has_x86_sse4_1())
+            features += ", SSE4.1";
+        if (cpuinfo_has_x86_sse4_2())
+            features += ", SSE4.2";
+        if (cpuinfo_has_x86_aes())
+            features += ", AES-NI";
+        if (cpuinfo_has_x86_sha())
+            features += ", SHA-NI";
+        if (cpuinfo_has_x86_avx())
+            features += ", AVX";
+        if (cpuinfo_has_x86_avx2())
+            features += ", AVX2";
+        if (cpuinfo_has_x86_avx512f() && cpuinfo_has_x86_avx512bw() && cpuinfo_has_x86_avx512dq() &&
+            cpuinfo_has_x86_avx512cd() && cpuinfo_has_x86_avx512vl())
+            features += ", AVX512(F, BW, DQ, CD, VL)";
+        if (cpuinfo_has_x86_avx10_1())
+            features += ", AVX10.1";
+        if (cpuinfo_has_x86_avx10_2())
+            features += ", AVX10.2";
+        if (cpuinfo_has_x86_popcnt())
+            features += ", POPCNT";
+        if (cpuinfo_has_x86_lzcnt())
+            features += ", LZCNT";
+        if (cpuinfo_has_x86_bmi())
+            features += ", BMI1";
+        if (cpuinfo_has_x86_bmi2())
+            features += ", BMI2";
+        if (cpuinfo_has_x86_fma3())
+            features += ", FMA3";
+        if (cpuinfo_has_x86_fma4())
+            features += ", FMA4";
+        if (cpuinfo_has_x86_f16c())
+            features += ", F16C";
 
-    std::ifstream f("/proc/cpuinfo");
-    std::string line;
+        std::ifstream f("/proc/cpuinfo");
+        std::string line;
 
-    while(std::getline(f, line)) {
-        if(line.contains(" vmx ")) {
-            features += ", Intel VT-X";
-            break;
+        while(std::getline(f, line)) {
+            if(line.contains(" vmx ")) {
+                features += ", Intel VT-X";
+                break;
+            }
+            if(line.contains(" svm ")) {
+                features += ", AMD-V";
+                break;
+            }
         }
-        if(line.contains(" svm ")) {
-            features += ", AMD-V";
-            break;
-        }
-    }
 
-    f.close();
+        f.close();
+    #elif defined(__aarch64__) || defined(__arm__)
+        struct utsname buffer;
+        uname(&buffer);
+        std::string features = std::string(buffer.machine) == "aarch64" ? "aarch64" : "arm";
+
+        if(cpuinfo_has_arm_neon()) features += ", NEON";
+        if(cpuinfo_has_arm_vfpv2()) features += ", VFPv2";
+        if(cpuinfo_has_arm_vfpv3()) features += ", VFPv3";
+        if(cpuinfo_has_arm_vfpv4()) features += ", VFPv4";
+        if(cpuinfo_has_arm_aes()) features += ", AES";
+        if(cpuinfo_has_arm_sha1()) features += ", SHA1";
+        if(cpuinfo_has_arm_sha2()) features += ", SHA2";
+        if(cpuinfo_has_arm_crc32()) features += ", CRC32";
+
+        if(cpuinfo_has_arm_sve()) features += ", SVE";
+        if(cpuinfo_has_arm_sve2()) features += ", SVE2";
+        if(cpuinfo_has_arm_bf16()) features += ", BFloat16";
+        if(cpuinfo_has_arm_i8mm()) features += ", Int8-MatMul";
+    #endif
 
     return features;
 }
@@ -196,6 +216,93 @@ std::string uarch_name() {
         }
         case cpuinfo_uarch_prescott: {
             return "Prescott";
+        }
+        case cpuinfo_uarch_cortex_a57: {
+            return "Cortex-A57";
+        }
+        case cpuinfo_uarch_cortex_a53: {
+            return "Cortex-A53";
+        }
+        case cpuinfo_uarch_cortex_a55: {
+            return "Cortex-A55";
+        }
+        case cpuinfo_uarch_cortex_a32: {
+            return "Cortex-A32";
+        }
+        case cpuinfo_uarch_cortex_a72: {
+            return "Cortex-A72";
+        }
+        case cpuinfo_uarch_cortex_a73: {
+            return "Cortex-A73";
+        }
+        case cpuinfo_uarch_cortex_a75: {
+            return "Cortex-A75";
+        }
+        case cpuinfo_uarch_cortex_a76: {
+            return "Cortex-A76";
+        }
+        case cpuinfo_uarch_cortex_a77: {
+            return "Cortex-A77";
+        }
+        case cpuinfo_uarch_cortex_a78: {
+            return "Cortex-A78";
+        }
+        case cpuinfo_uarch_cortex_x1: {
+            return "Cortex-X1";
+        }
+        case cpuinfo_uarch_cortex_x2: {
+            return "Cortex-X2";
+        }
+        case cpuinfo_uarch_cortex_x3: {
+            return "Cortex-X3";
+        }
+        case cpuinfo_uarch_cortex_x4: {
+            return "Cortex-X4";
+        }
+        case cpuinfo_uarch_cortex_x925: {
+            return "Cortex-X925";
+        }
+        case cpuinfo_uarch_arm7: {
+            return "ARM7";
+        }
+        case cpuinfo_uarch_hurricane: {
+            return "Apple Hurricane (A10)";
+        }
+        case cpuinfo_uarch_monsoon: {
+            return "Apple Monsoon (A11)";
+        }
+        case cpuinfo_uarch_vortex: {
+            return "Apple Vortex (A12)";
+        }
+        case cpuinfo_uarch_lightning: {
+            return "Apple Lightning (A13)";
+        }
+        case cpuinfo_uarch_firestorm: {
+            return "Apple Firestorm (A14/M1)";
+        }
+        case cpuinfo_uarch_avalanche: {
+            return "Apple Avalanche (A15/M2)";
+        }
+        case cpuinfo_uarch_kryo: {
+            return "Qualcomm Kryo";
+        }
+        case cpuinfo_uarch_krait: {
+            return "Qualcomm Krait";
+        }
+        case cpuinfo_uarch_exynos_m1: {
+            return "Samsung Mongoose M1";
+        }
+        case cpuinfo_uarch_exynos_m2: {
+            return "Samsung Mongoose M2";
+        }
+        case cpuinfo_uarch_exynos_m3: {
+            return "Samsung Meerkat M3";
+        }
+        case cpuinfo_uarch_exynos_m4: {
+            return "Samsung Mongoose M4";
+        }
+        case cpuinfo_uarch_exynos_m5: {
+            return "Samsung Mongoose M5";
         }
         default: {
             char b[32];
@@ -324,7 +431,7 @@ int main(int argc, char *argv[]) {
 
     {
         about = new Fl_Box(10, 35, 460, 200,
-            "CPU-INF 1.1\nBy Naharashu\nRepo: https://github.com/Naharashu/cpuinf");
+            "CPU-INF 1.2\nBy Naharashu\nRepo: https://github.com/Naharashu/cpuinf");
         about->align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_WRAP);
     }
     page2->end();
