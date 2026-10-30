@@ -1,4 +1,4 @@
-CPU-INF is tiny analog of CPU-Z for x86/x64 linux.
+CPU-INF is tiny analog of CPU-Z for x86 and ARM linux.
 
 ## Requirements to build:
 

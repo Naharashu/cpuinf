@@ -19,6 +19,8 @@
 #include "./intel.xpm"
 #include "./amd.xpm"
 #include "./logo.xpm"
+#include "./x86.xpm"
+#include "./arm.xpm"
 
 
 std::string get_features() {
@@ -189,11 +191,17 @@ std::string uarch_name() {
         case cpuinfo_uarch_darkmont: {
             return "Darkmont";
         }
+        case cpuinfo_uarch_gracemont: {
+            return "Gracemont";
+        }
         case cpuinfo_uarch_prescott: {
             return "Prescott";
         }
-        default:
-            return "Unknown";
+        default: {
+            char b[32];
+            snprintf(b, sizeof b, "Unknown (0x%08x)", (unsigned)core->uarch);
+            return b;
+        }
     }
 }
 
@@ -240,10 +248,11 @@ void info(void* data) {
         << "Cores: " << cpuinfo_get_cores_count() << '\n'
         << "Threads: " << cpu->processor_count 
         << "\n────────────────────────────\n"
-        << "L1 cache: " << (cpuinfo_get_l1d_caches()->size + cpuinfo_get_l1i_caches()->size) / 1024 << " KB" << '\n'
-        << "L2 cache: " << cpuinfo_get_l2_caches()->size / 1024 << " KB" << '\n'
-        << "L3 cache: " << cpuinfo_get_l3_caches()->size / 1024 << " KB" 
-        << "\n────────────────────────────\n"
+        << "L1 cache(per core): " << (cpuinfo_get_l1d_caches()->size + cpuinfo_get_l1i_caches()->size) / 1024 << " KB" << '\n'
+        << "L2 cache(per core): " << cpuinfo_get_l2_caches()->size / 1024 << " KB" << '\n'
+        << "L3 cache(shared): " << cpuinfo_get_l3_caches()->size / 1024 << " KB";
+        if(cpuinfo_get_l4_caches_count()!=0) buf << "L4 cache(shared): " << cpuinfo_get_l4_caches()->size / 1024 << " KB";
+        buf << "\n────────────────────────────\n"
         << "Supported features: " << get_features() << '\n';
     
     text->copy_label(buf.str().c_str());
@@ -290,6 +299,11 @@ int main(int argc, char *argv[]) {
             logo = new Fl_Pixmap(a7532d739e484bb0b8026fc3dee2c8fczbY8e1bcgFOGFION);
         } else if (Name.contains("AMD")) {
             logo = new Fl_Pixmap(_896298cf7884ce9b8b8925cc26ee1da9QPlpZag3dnKj3xm);
+        } else if(CPUINFO_ARCH_ARM) {
+            logo = new Fl_Pixmap(_d658913e4f1481fca4d8e42666191905vjjs7DCV0dOfPUI);
+        }
+        else {
+            logo = new Fl_Pixmap(ac9272be786241c1873bd4107befbd7bBonTsxvp7JqUBHZ3);
         }
         if (logo) {
             image_box = new Fl_Box(176, 35, 128, 128);
